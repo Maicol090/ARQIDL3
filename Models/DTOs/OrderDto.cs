@@ -12,7 +12,6 @@
     {
         public string ProductName { get; set; } = null!;
         public decimal Price { get; set; }
-        public decimal PriceDiscount { get; set; }
         public int Quantity { get; set; }
         public decimal Subtotal { get; set; }
     }

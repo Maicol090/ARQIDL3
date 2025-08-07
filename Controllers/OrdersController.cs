@@ -31,8 +31,8 @@ public class OrdersController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateOrder([FromBody] OrderCreateDto dto)
     {
-        var success = await _service.CreateOrderAsync(dto);
-        if (!success) return BadRequest("Error al crear el pedido. Verifica stock o datos.");
+        var result = await _service.CreateOrderAsync(dto);
+        if (result == null) return BadRequest("Error al crear el pedido. Verifica stock o datos.");
         return Ok(new { message = "Pedido creado con éxito" });
     }
 

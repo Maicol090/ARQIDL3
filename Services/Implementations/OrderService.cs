@@ -51,55 +51,46 @@ namespace ARQIDL3.Services.Implementations
             return true;
         }
 
-        public async Task<bool> CreateOrderAsync(OrderCreateDto dto)
+        public async Task<Order> CreateOrderAsync(OrderCreateDto dto)
         {
-            using var transaction = await _context.Database.BeginTransactionAsync();
-
-            try
+            var order = new Order
             {
-                var order = new Order
+                OrderDate = DateTime.Now,
+                Status = "Pendiente",
+                Total = 0,
+                OrderDetails = new List<OrderDetail>()
+            };
+
+            foreach (var item in dto.Products)
+            {
+                var product = _context.Products.FirstOrDefault(p => p.ProductId == item.ProductId);
+
+                if (product == null)
+                    throw new Exception($"Producto con ID {item.ProductId} no encontrado.");
+
+                var finalPrice = product.PriceDiscount > 0 ? product.PriceDiscount : product.Price;
+
+                var detail = new OrderDetail
                 {
-                    OrderDate = DateTime.UtcNow,
-                    Status = "Pendiente",
-                    OrderDetails = new List<OrderDetail>()
+                    ProductId = product.ProductId,
+                    Quantity = item.Quantity,
+                    Price = finalPrice, 
+                    Subtotal = finalPrice * item.Quantity
                 };
 
-                decimal total = 0;
+                order.Total += detail.Subtotal;
 
-                foreach (var item in dto.Products)
-                {
-                    var product = await _context.Products.FindAsync(item.ProductId);
-                    if (product == null || product.Stock < item.Quantity)
-                        throw new Exception("Producto inválido o sin stock");
-                    var priceToUse = item.PriceDiscount != 0 ? item.PriceDiscount : item.Price;
-                    var subtotal = priceToUse * item.Quantity;
+                product.Stock -= item.Quantity; 
 
-                    order.OrderDetails.Add(new OrderDetail
-                    {
-                        ProductId = item.ProductId,
-                        Quantity = item.Quantity,
-                        Price = item.Price,
-                        PriceDiscount = item.PriceDiscount,
-                        Subtotal = subtotal
-                    });
-
-                    product.Stock -= item.Quantity;
-                    total += subtotal;
-                }
-
-                order.Total = total;
-
-                _context.Orders.Add(order);
-                await _context.SaveChangesAsync();
-                await transaction.CommitAsync();
-                return true;
+                order.OrderDetails.Add(detail);
             }
-            catch
-            {
-                await transaction.RollbackAsync();
-                return false;
-            }
+
+            _context.Orders.Add(order);
+            await _context.SaveChangesAsync();
+
+            return order;
         }
+
 
         private OrderDto MapToDto(Order order)
         {
@@ -114,7 +105,6 @@ namespace ARQIDL3.Services.Implementations
                     ProductName = d.Product.Name,
                     Quantity = d.Quantity,
                     Price = d.Price,
-                    PriceDiscount = d.PriceDiscount,
                     Subtotal = d.Subtotal
                 }).ToList()
             };

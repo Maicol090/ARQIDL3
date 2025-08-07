@@ -1,4 +1,5 @@
 ﻿using ARQIDL3.Models.DTOs;
+using ARQIDL3.Models.Entities;
 
 namespace ARQIDL3.Services.Interfaces
 {
@@ -7,7 +8,7 @@ namespace ARQIDL3.Services.Interfaces
         Task<OrderDto?> GetOrderByIdAsync(int id);
         Task<List<OrderDto>> GetOrdersAsync(int page, int size);
         Task<bool> MarkAsDeliveredAsync(int id);
-        Task<bool> CreateOrderAsync(OrderCreateDto dto);
+        Task<Order> CreateOrderAsync(OrderCreateDto dto);
     }
 
 }

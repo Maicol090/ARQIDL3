@@ -32,7 +32,6 @@ namespace ARQIDL3.Data
             modelBuilder.Entity<OrderDetail>(entity =>
             {
                 entity.Property(od => od.Price).HasPrecision(18, 2);
-                entity.Property(od => od.PriceDiscount).HasPrecision(18, 2);
                 entity.Property(od => od.Subtotal).HasPrecision(18, 2);
             });
 
