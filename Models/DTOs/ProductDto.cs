@@ -2,7 +2,7 @@
 {
     public class ProductDto
     {
-        public int ProductId { get; set; }
+        public int Id { get; set; }
         public string Name { get; set; } = null!;
         public string Description { get; set; } = null!;
         public decimal Price { get; set; }
@@ -11,7 +11,7 @@
         public string BrandName { get; set; } = null!;
         public string StoreName { get; set; } = null!;
         public string CategoryName { get; set; } = null!;
-        public List<string> ImageUrls { get; set; } = new();
+        public List<string> Images { get; set; } = new();
     }
 
 }

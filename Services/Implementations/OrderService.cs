@@ -26,10 +26,11 @@ namespace ARQIDL3.Services.Implementations
 
             return MapToDto(order);
         }
-
-        public async Task<List<OrderDto>> GetOrdersAsync(int page, int size)
+        public async Task<PagedResponse<OrderDto>> GetOrdersAsync(int page, int size)
         {
             var skip = (page - 1) * size;
+
+            var totalElements = await _context.Orders.CountAsync();
 
             var orders = await _context.Orders
                 .Include(o => o.OrderDetails)
@@ -37,8 +38,16 @@ namespace ARQIDL3.Services.Implementations
                 .Skip(skip)
                 .Take(size)
                 .ToListAsync();
+            var totalPages = (int)Math.Ceiling(totalElements / (double)size);
 
-            return orders.Select(MapToDto).ToList();
+            return new PagedResponse<OrderDto>
+            {
+                Content = orders.Select(MapToDto).ToList(),
+                TotalElements = totalElements,
+                Number = page,
+                Size = size,
+                TotalPages = totalPages
+            };
         }
 
         public async Task<bool> MarkAsDeliveredAsync(int id)
@@ -96,7 +105,7 @@ namespace ARQIDL3.Services.Implementations
         {
             return new OrderDto
             {
-                OrderId = order.OrderId,
+                Id = order.OrderId,
                 OrderDate = order.OrderDate,
                 Status = order.Status,
                 Total = order.Total,

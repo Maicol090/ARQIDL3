@@ -19,7 +19,7 @@ namespace ARQIDL3.Services.Implementations
             return await _context.Categories
                 .Select(c => new CategoryDto
                 {
-                    CategoryId = c.CategoryId,
+                    Id = c.CategoryId,
                     CategoryName = c.CategoryName
                 }).ToListAsync();
         }

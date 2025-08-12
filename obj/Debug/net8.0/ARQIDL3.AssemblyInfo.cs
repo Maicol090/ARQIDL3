@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ARQIDL3")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2c331958440b3e022a65c96816deb1e5d9359b12")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ebeea4fa96ab372377dfb8b6a3fe405fc3704a3e")]
 [assembly: System.Reflection.AssemblyProductAttribute("ARQIDL3")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ARQIDL3")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -13,8 +13,7 @@ namespace ARQIDL3.Services.Implementations
         {
             _context = context;
         }
-
-        public async Task<List<ProductDto>> GetFilteredProductsAsync(ProductFilterDto filter)
+        public async Task<PagedResponse<ProductDto>> GetFilteredProductsAsync(ProductFilterDto filter)
         {
             var query = _context.Products
                 .Include(p => p.Images)
@@ -33,16 +32,17 @@ namespace ARQIDL3.Services.Implementations
             if (!string.IsNullOrEmpty(filter.Search))
                 query = query.Where(p => p.Name.Contains(filter.Search));
 
+            var totalElements = await query.CountAsync();
+
             var skip = (filter.Page - 1) * filter.Size;
 
             var products = await query
                 .Skip(skip)
                 .Take(filter.Size)
                 .ToListAsync();
-
-            return products.Select(p => new ProductDto
+            var content = products.Select(p => new ProductDto
             {
-                ProductId = p.ProductId,
+                Id = p.ProductId,
                 Name = p.Name,
                 Description = p.Description,
                 Price = p.Price,
@@ -51,8 +51,17 @@ namespace ARQIDL3.Services.Implementations
                 BrandName = p.BrandName,
                 StoreName = p.StoreName,
                 CategoryName = p.Category.CategoryName,
-                ImageUrls = p.Images.Select(i => i.Url).ToList()
+                Images = p.Images.Select(i => i.Url).ToList()
             }).ToList();
+
+            return new PagedResponse<ProductDto>
+            {
+                Content = content,
+                TotalElements = totalElements,
+                Number = filter.Page,
+                Size = filter.Size,
+                TotalPages = (int)Math.Ceiling(totalElements / (double)filter.Size)
+            };
         }
 
         public async Task<ProductDto?> GetProductByIdAndStoreAsync(int id, string storeName)
@@ -66,7 +75,7 @@ namespace ARQIDL3.Services.Implementations
 
             return new ProductDto
             {
-                ProductId = product.ProductId,
+                Id = product.ProductId,
                 Name = product.Name,
                 Description = product.Description,
                 Price = product.Price,
@@ -75,7 +84,7 @@ namespace ARQIDL3.Services.Implementations
                 BrandName = product.BrandName,
                 StoreName = product.StoreName,
                 CategoryName = product.Category.CategoryName,
-                ImageUrls = product.Images.Select(i => i.Url).ToList()
+                Images = product.Images.Select(i => i.Url).ToList()
             };
         }
     }
